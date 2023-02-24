@@ -1,5 +1,5 @@
 import csv
-import random 
+import random
 from typing import Tuple
 
 def main() -> None:
