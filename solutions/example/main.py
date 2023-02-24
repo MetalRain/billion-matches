@@ -60,6 +60,9 @@ def main() -> None:
                     break
         deliveries.append((s[0], items_to_deliver))
 
+    # Sort by subscriber id
+    deliveries.sort(key=lambda delivery: delivery[0])
+
     # write result
     with open('./output/output.csv', 'w') as f:
         w = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
