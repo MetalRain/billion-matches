@@ -1,6 +1,9 @@
 import argparse
 import csv
-from typing import Tuple
+import gc
+from typing import Dict, Tuple
+
+from tqdm import tqdm
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='Billion matches example')
@@ -34,6 +37,17 @@ def main() -> None:
                 split_ids(row[2])
             ))
 
+    # group items by label
+    label_item_map: Dict[int, list[Tuple[int, int]]] = {l: [] for l in labels}
+    for i in tqdm(items, desc='Items'):
+        for l in i[2]:
+            label_item_map[l].append((i[0], i[1]))
+
+    # Free up memory
+    items = []
+    labels = []
+    gc.collect()
+
     # read subscribers
     with open(args.subscribers) as f:
         r = csv.reader(f, delimiter=',', quoting=csv.QUOTE_NONE)
@@ -45,33 +59,28 @@ def main() -> None:
                 split_ids(row[1])
             ))
 
-    # sort items
-    items.sort(key=lambda item: item[1])
-
-    # collect deliveries
-    deliveries: list[Tuple[int, list[int]]] = []
-
-    for s in subscribers:
-        items_to_deliver: list[int] = []
-        for i in items:
-            for l in i[2]:
-                if l in s[1]:
-                    items_to_deliver.append(i[0])
-                    break
-        deliveries.append((s[0], items_to_deliver))
-
-    # Sort by subscriber id
-    deliveries.sort(key=lambda delivery: delivery[0])
+    # sort subscribers
+    subscribers.sort(key=lambda sub: sub[0])
 
     # write result
     with open('./output/output.csv', 'w') as f:
         w = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
         w.writerow(['subscriber_id', 'item_ids'])
-        for d in deliveries:
-            w.writerow([
-                str(d[0]),
-                join_ids(d[1])
-            ])
+
+        for s_id, s_labels in tqdm(subscribers, desc='Subscribers'):
+            # collect matching items
+            items_to_deliver: Dict[int, int] = {
+                i_ts: i_id
+                for l in s_labels
+                for i_id, i_ts in label_item_map[l]
+            }
+
+            # sort by timestamp
+            row = [
+                str(s_id),
+                join_ids([i_id for i_ts, i_id in sorted(items_to_deliver.items())])
+            ]
+            w.writerow(row)
 
 def split_ids(id_str) -> list[int]:
     return [int(id) for id in id_str.split('|')]

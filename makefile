@@ -13,8 +13,8 @@ build: |
 run: |
 	@echo 'Running solution: $(solution)'
 	@time docker run \
-		--cpus=1 \
-		--memory=512m \
+		--cpus=2 \
+		--memory=1g \
 		--volume=$(shell pwd)/solutions/$(solution)/output:/app/output:rw \
 		--volume=$(shell pwd)/data/data:/app/data:ro \
 		billion-matches-solution:s-$(solution)

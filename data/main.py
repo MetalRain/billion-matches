@@ -52,7 +52,7 @@ def join_labels(label_ids: list[int]) -> str:
     return '|'.join([str(label_id) for label_id in label_ids])
 
 def gen_million() -> list[int]:
-    return [int(id) for id in range(1, 1_000)]
+    return [int(id) for id in range(1, 10_000)]
 
 if __name__ == "__main__":
     main()
