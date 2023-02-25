@@ -12,52 +12,47 @@ def main() -> None:
     parser.add_argument('subscribers')
     args = parser.parse_args()
 
-    # read data
-    labels: list[int] = []
-    items: list[Tuple[int, int, list[int]]] = []
-    subscribers: list[Tuple[int, list[int]]]  = []
+    # group items by label
+    label_item_map: Dict[int, Dict[int, int]] = {}
 
     # read labels
     with open(args.labels) as f:
         r = csv.reader(f, delimiter=',', quoting=csv.QUOTE_NONE)
         # skip header line
         r.__next__()
-        for row in r:
-            labels.append(int(row[0]))
+        for row in tqdm(r, desc='Read labels'):
+            label_item_map[int(row[0])] = {}
+
+    gc.collect()
         
     # read items
     with open(args.items) as f:
         r = csv.reader(f, delimiter=',', quoting=csv.QUOTE_NONE)
         # skip header line
         r.__next__()
-        for row in r:
-            items.append((
-                int(row[0]),
-                int(row[1]),
-                split_ids(row[2])
-            ))
+        for row in tqdm(r, desc='Read items'):
+            id = int(row[0])
+            ts = int(row[1])
+            for l in split_ids(row[2]):
+                # here we have assumption: one timestamp has only one item
+                label_item_map[l][ts] = id
 
-    # group items by label
-    label_item_map: Dict[int, list[Tuple[int, int]]] = {l: [] for l in labels}
-    for i in tqdm(items, desc='Items'):
-        for l in i[2]:
-            label_item_map[l].append((i[0], i[1]))
-
-    # Free up memory
-    items = []
-    labels = []
     gc.collect()
+
+    subscribers: list[Tuple[int, list[int]]]  = []
 
     # read subscribers
     with open(args.subscribers) as f:
         r = csv.reader(f, delimiter=',', quoting=csv.QUOTE_NONE)
         # skip header line
         r.__next__()
-        for row in r:
+        for row in tqdm(r, desc='Read subscribers'):
             subscribers.append((
                 int(row[0]),
                 split_ids(row[1])
             ))
+
+    gc.collect()
 
     # sort subscribers
     subscribers.sort(key=lambda sub: sub[0])
@@ -67,17 +62,16 @@ def main() -> None:
         w = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
         w.writerow(['subscriber_id', 'item_ids'])
 
-        for s_id, s_labels in tqdm(subscribers, desc='Subscribers'):
+        for s_id, s_labels in tqdm(subscribers, desc='Process deliveries'):
             # collect matching items
-            items_to_deliver: Dict[int, int] = {
-                i_ts: i_id
-                for l in s_labels
-                for i_id, i_ts in label_item_map[l]
-            }
+            # dict deduplicates items
+            items_to_deliver: Dict[int, int] = {}
+            for l in s_labels:
+                items_to_deliver.update(label_item_map[l])
 
-            # sort by timestamp
             row = [
                 str(s_id),
+                # sort items by timestamp
                 join_ids([i_id for i_ts, i_id in sorted(items_to_deliver.items())])
             ]
             w.writerow(row)
