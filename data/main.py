@@ -36,7 +36,7 @@ def main() -> None:
     # output items
     with open('./data/items.csv', 'w') as f:
         w = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
-        w.writerow(['id'])
+        w.writerow(['id', 'timestamp', 'label_ids'])
         for item in tqdm(items, desc='Write items'):
             w.writerow([str(item[0]), str(item[1]), join_labels(item[2])])
     items = []
@@ -51,7 +51,7 @@ def main() -> None:
     # output subscribers
     with open('./data/subscribers.csv', 'w') as f:
         w = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
-        w.writerow(['id'])
+        w.writerow(['id', 'label_ids'])
         for sub in tqdm(subscribers, desc='Write subscribers'):
             w.writerow([str(sub[0]), join_labels(sub[1])])
     subscribers = []
