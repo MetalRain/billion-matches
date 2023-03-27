@@ -16,7 +16,12 @@ We sort that map by key (timestamp) and get values (item ids).
 
 On Intel Core i7 9700K running in WSL I get following results:
 ```
-Running solution: example                                                                                                      Read labels: 50000it [00:00, 1282622.55it/s]                                                                                   Read items: 100000it [00:01, 79409.45it/s]                                                                                     Read subscribers: 100000it [00:00, 158012.19it/s]                                                                              Process deliveries: 100%|██████████| 100000/100000 [01:06<00:00, 1494.44it/s]                                                  0.10 user 0.14 system 1:11.57 elapsed 0% CPU
+Running solution: example
+Read labels: 50000it [00:00, 1282622.55it/s]
+Read items: 100000it [00:01, 79409.45it/s]
+Read subscribers: 100000it [00:00, 158012.19it/s]
+Process deliveries: 100%|██████████| 100000/100000 [01:06<00:00, 1494.44it/s]
+0.10 user 0.14 system 1:11.57 elapsed 0% CPU
 (0 avgtext+0 avgdata 52128 maxresident) k
 1056 inputs + 0 outputs (8 major + 3898 minor) pagefaults 0 swaps
 ```

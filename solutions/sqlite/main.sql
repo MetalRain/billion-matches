@@ -56,12 +56,21 @@ ORDER BY id;
 .print 'Producing result file'
 .headers on
 .output /app/output/output.csv
+WITH items_per_subscription AS (
+  SELECT
+    s.id as subscriber_id,
+    i.id as item_id,
+    MIN(i.timestamp) as timestamp
+  FROM subscribers_with_labels s
+  LEFT JOIN items_with_labels i
+    ON (i.label_id = s.label_id)
+  GROUP BY s.id, i.id
+  ORDER BY s.id, MIN(i.timestamp)
+)
 SELECT
-  s.id as subscriber_id,
-  GROUP_CONCAT(i.id, '|') as item_ids
-FROM subscribers_with_labels s
-LEFT JOIN items_with_labels i
-  ON (i.label_id = s.label_id)
-GROUP BY s.id
-ORDER BY s.id, i.timestamp;
+  subscriber_id,
+  GROUP_CONCAT(item_id, '|') as item_ids
+FROM items_per_subscription
+GROUP BY subscriber_id
+ORDER BY subscriber_id;
 .quit
