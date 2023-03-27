@@ -23,8 +23,6 @@ Processing items
 Processing subscribers
 Calculating result
 Producing result file
-0.00 user 0.06 system
-2:16.66 elapsed 0% CPU
-(0 avgtext+0 avgdata 53704 maxresident)k
-0 inputs + 0 outputs (0 major + 4058 minor) pagefaults 0 swaps
+0.02user 0.04system 1:36.04elapsed 0%CPU (0avgtext+0avgdata 52212maxresident)k
+0inputs+0outputs (0major+3911minor)pagefaults 0swaps
 ```

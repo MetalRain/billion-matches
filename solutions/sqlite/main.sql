@@ -53,9 +53,10 @@ WHERE ss.label_id != ''
 ORDER BY id;
 
 
-.print 'Calculating result'
-CREATE TABLE result(subscriber_id integer, item_ids text);
-INSERT INTO result SELECT
+.print 'Producing result file'
+.headers on
+.output /app/output/output.csv
+SELECT
   s.id as subscriber_id,
   GROUP_CONCAT(i.id, '|') as item_ids
 FROM subscribers_with_labels s
@@ -63,10 +64,4 @@ LEFT JOIN items_with_labels i
   ON (i.label_id = s.label_id)
 GROUP BY s.id
 ORDER BY s.id, i.timestamp;
-
-
-.print 'Producing result file'
-.headers on
-.output /app/output/output.csv
-SELECT * FROM result ORDER BY subscriber_id;
 .quit
