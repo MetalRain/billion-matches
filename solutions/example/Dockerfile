@@ -4,4 +4,4 @@ WORKDIR /app/
 
 RUN ["pip", "install", "tqdm"]
 COPY main.py ./main.py
-CMD ["python", "main.py", "./data/labels.csv", "./data/items.csv", "./data/subscribers.csv"] 
+CMD ["python", "main.py", "./data/items.csv", "./data/subscribers.csv"]
