@@ -17,6 +17,13 @@ Read subscribers into vector:
 
 For each subscriber:
 
+    Split id string into list
+
+    Use member of interval https://www.jsoftware.com/help/dictionary/decapdot.htm
+    to find split points
+
+    Join sub sequences 
+
     Create matching [table](https://www.jsoftware.com/help/dictionary/d420.htm)
 
     `matches =: subscriber_labels =/ items_labels`
